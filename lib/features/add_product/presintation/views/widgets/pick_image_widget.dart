@@ -39,25 +39,20 @@ class PickImageWidget extends StatelessWidget {
                         borderType: BorderType.RRect,
                         radius: const Radius.circular(12),
                         strokeWidth: 2,
-                        child: Center(
+                        child: const Center(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.image_outlined,
                                 size: 80,
                                 color: Colors.grey,
                               ),
-                              const SizedBox(height: 7),
+                              SizedBox(height: 7),
                               Text(
                                 "اختر صورة المنتج",
-                                style: TextStyle(
-                                  color: imageIsSelected == true ||
-                                          imageIsSelected == null
-                                      ? Colors.grey
-                                      : Colors.red,
-                                ),
+                                style: TextStyle(color: Colors.grey),
                               ),
                             ],
                           ),
@@ -75,7 +70,9 @@ class PickImageWidget extends StatelessWidget {
           right: 0,
           child: Material(
             borderRadius: BorderRadius.circular(16.0),
-            color: StyleColors.primaryColor,
+            color: imageIsSelected == true || imageIsSelected == null
+                ? StyleColors.primaryColor
+                : Colors.red,
             child: InkWell(
               splashColor: Colors.red,
               borderRadius: BorderRadius.circular(16.0),

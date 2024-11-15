@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fruit_hub_admin/features/order/presintation/views/order_view.dart';
 
-import '../../../products/presintation/views/add_new_products_view.dart';
-import '../../../products/presintation/views/all_produts_view.dart';
+ import '../../../add_product/presintation/views/add_new_products_view.dart';
 import 'widgets/dashboard_btn.dart';
 
 class HomeView extends StatelessWidget {
@@ -12,8 +11,15 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Fruit Hub Admin',
+        title: const Text('Fruit Hub Admin'),
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Hero(
+            tag: 'appLogo',
+            child: Image.asset(
+              'assets/images/app_logo.png',
+            ),
+          ),
         ),
       ),
       body: Padding(
@@ -35,7 +41,7 @@ class HomeView extends StatelessWidget {
                 title: "عرض جميع المنتجات",
                 imagePath: 'assets/images/app_logo.png',
                 onPressed: () {
-                  Navigator.pushNamed(context, AllProductsView.routeName);
+                  // Navigator.pushNamed(context, AllProductsView.routeName);
                 },
               ),
               DashboardButtonsWidget(
@@ -43,7 +49,7 @@ class HomeView extends StatelessWidget {
                 title: "الطلبات",
                 imagePath: 'assets/images/dashboard/order.png',
                 onPressed: () {
-                  Navigator.pushNamed(context, OrderView.routeName);
+                  Navigator.pushReplacementNamed(context, OrderView.routeName);
                 },
               ),
             ]),
