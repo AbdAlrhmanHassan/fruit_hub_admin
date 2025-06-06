@@ -3,12 +3,11 @@ import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fruit_hub_admin/core/helper_function/validation_function.dart';
 import 'package:fruit_hub_admin/core/style/app_colors.dart';
-import 'package:fruit_hub_admin/features/add_product/domain/entities/add_product_input_entity.dart';
+import 'package:fruit_hub_admin/features/add_product/domain/entities/product_entity.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../../../../core/style/border.dart';
 import '../../../../../core/widgets/screen_size.dart';
@@ -32,16 +31,24 @@ class _AddNewProductsViewBodyState extends State<AddNewProductsViewBody> {
   String? productImageUrl;
 
   TextEditingController titleController = TextEditingController();
-  TextEditingController priceController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
   TextEditingController codeController = TextEditingController();
 
+  TextEditingController priceController = TextEditingController();
+  TextEditingController expirationMonthsController = TextEditingController();
+  TextEditingController caloriesController = TextEditingController();
+  TextEditingController calorieAmountController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController discountAmountController = TextEditingController();
   @override
   void dispose() {
     titleController.dispose();
     priceController.dispose();
     descriptionController.dispose();
     codeController.dispose();
+    expirationMonthsController.dispose();
+    caloriesController.dispose();
+    calorieAmountController.dispose();
+    discountAmountController.dispose();
     super.dispose();
   }
 
@@ -58,12 +65,12 @@ class _AddNewProductsViewBodyState extends State<AddNewProductsViewBody> {
       context: context,
       cameraFCT: () async {
         imgFile = await picker.pickImage(
-            source: ImageSource.camera, imageQuality: 70);
+            source: ImageSource.camera, imageQuality: 50);
         setState(() {});
       },
       galleryFCT: () async {
         imgFile = await picker.pickImage(
-            source: ImageSource.gallery, imageQuality: 70);
+            source: ImageSource.gallery, imageQuality: 50);
         setState(() {});
       },
       removeFCT: () {
@@ -76,6 +83,7 @@ class _AddNewProductsViewBodyState extends State<AddNewProductsViewBody> {
 
   bool? imageIsSelected;
   bool isFeatured = false;
+  bool isOrganic = false;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AddNewProductCubit, AddNewProductState>(
@@ -117,7 +125,6 @@ class _AddNewProductsViewBodyState extends State<AddNewProductsViewBody> {
                           TextFormField(
                             controller: titleController,
                             key: const ValueKey('Title'),
-                            maxLength: 80,
                             minLines: 1,
                             maxLines: 1,
                             keyboardType: TextInputType.multiline,
@@ -136,6 +143,23 @@ class _AddNewProductsViewBodyState extends State<AddNewProductsViewBody> {
                           const SizedBox(
                             height: 10,
                           ),
+                          TextFormField(
+                            textInputAction: TextInputAction.next,
+                            controller: codeController,
+                            key: const ValueKey('Code'),
+                            keyboardType: TextInputType.text,
+                            decoration: InputDecoration(
+                              border: customInputBorder(),
+                              enabledBorder: customInputBorder(),
+                              focusedBorder: customInputBorder(
+                                  activeColor: StyleColors.primaryColor),
+                              hintText: 'الكود',
+                            ),
+                            validator: (value) {
+                              return validateField(value, 'الكود');
+                            },
+                          ),
+                          const SizedBox(height: 10),
                           Row(
                             children: [
                               Flexible(
@@ -179,24 +203,155 @@ class _AddNewProductsViewBodyState extends State<AddNewProductsViewBody> {
                                 flex: 1,
                                 child: TextFormField(
                                   textInputAction: TextInputAction.next,
-                                  controller: codeController,
-                                  key: const ValueKey('Code'),
-                                  keyboardType: TextInputType.text,
+                                  controller: discountAmountController,
+                                  key: const ValueKey('Discount Amount'),
+                                  keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                     border: customInputBorder(),
                                     enabledBorder: customInputBorder(),
                                     focusedBorder: customInputBorder(
                                         activeColor: StyleColors.primaryColor),
-                                    hintText: 'الكود',
+                                    hintText: 'مقدار الخصم',
+                                    suffixIcon: const Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'JOD',
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   validator: (value) {
-                                    return validateField(value, 'الكود');
+                                    return validateField(value, 'مقدار الخصم');
                                   },
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  textInputAction: TextInputAction.next,
+                                  controller: expirationMonthsController,
+                                  key: const ValueKey('expirationMonths'),
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    border: customInputBorder(),
+                                    enabledBorder: customInputBorder(),
+                                    focusedBorder: customInputBorder(
+                                        activeColor: StyleColors.primaryColor),
+                                    hintText: 'أشهر الصلاحية',
+                                  ),
+                                  validator: (value) {
+                                    return validateField(
+                                        value, 'أشهر الصلاحية');
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Spacer(),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Flexible(
+                                flex: 1,
+                                child: TextFormField(
+                                  textInputAction: TextInputAction.next,
+                                  controller: caloriesController,
+                                  key: const ValueKey('calorie'),
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    border: customInputBorder(),
+                                    enabledBorder: customInputBorder(),
+                                    focusedBorder: customInputBorder(
+                                        activeColor: StyleColors.primaryColor),
+                                    hintText: 'كالوري',
+                                  ),
+                                  validator: (value) {
+                                    return validateField(value, 'كالوري');
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 1,
+                                child: TextFormField(
+                                  textInputAction: TextInputAction.next,
+                                  controller: calorieAmountController,
+                                  key: const ValueKey('calorie amouont'),
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    border: customInputBorder(),
+                                    enabledBorder: customInputBorder(),
+                                    focusedBorder: customInputBorder(
+                                        activeColor: StyleColors.primaryColor),
+                                    hintText: 'الكالوري لكل ',
+                                    suffixIcon: const Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'غرام',
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  validator: (value) {
+                                    return validateField(
+                                        value, 'نسبة الكالوري');
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              Checkbox(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                value: isFeatured,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isFeatured = value!;
+                                  });
+                                },
+                                activeColor: const Color(0xff1B5E37),
+                              ),
+                              const Text(
+                                'عنصر مميز',
+                              ),
+                              const SizedBox(width: 50),
+                              Checkbox(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                value: isOrganic,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isOrganic = value!;
+                                  });
+                                },
+                                activeColor: const Color(0xff1B5E37),
+                              ),
+                              const Text(
+                                'عضوي',
+                              )
+                            ],
+                          ),
+                          const SizedBox(height: 10),
                           TextFormField(
                             textInputAction: TextInputAction.done,
                             key: const ValueKey('Description'),
@@ -216,27 +371,9 @@ class _AddNewProductsViewBodyState extends State<AddNewProductsViewBody> {
                               return validateField(value, "وصف المنتج");
                             },
                           ),
-                          Row(
-                            children: [
-                              Checkbox(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                value: isFeatured,
-                                onChanged: (value) {
-                                  setState(() {
-                                    isFeatured = value!;
-                                  });
-                                },
-                                activeColor: const Color(0xff1B5E37),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  'عنصر مميز',
-                                ),
-                              )
-                            ],
-                          ),
+                          const SizedBox(
+                            height: kBottomNavigationBarHeight + 30,
+                          )
                         ],
                       ),
                     ),
@@ -316,35 +453,40 @@ class _AddNewProductsViewBodyState extends State<AddNewProductsViewBody> {
                               autovalidateMode = AutovalidateMode.always;
                               imageIsSelected = imgFile != null ? true : false;
                               setState(() {});
+
                               if (isValid && imgFile != null) {
                                 _formKey.currentState!.save();
-                                // AddProductInputEntity(
-                                //   name: titleController.value.text,
-                                //   code: codeController.value.text,
-                                //   description: descriptionController.value.text,
-                                //   price: priceController.text,
-                                //   imageFile: 'imageFile',
-                                //   isFeatured: isFeatured,
-                                // );
-                                // productImageUrl =
-                                //     await BlocProvider.of<AddNewProductCubit>(
-                                //             context)
-                                //         .uploadImage(
-                                //             imageFile: File(imgFile!.path),
-                                //             productId: productId);
+                                File? fileImage = File(imgFile!.path);
 
-                                // BlocProvider.of<AddNewProductCubit>(context)
-                                //     .addNewProduct(
-                                //   productImage: productImageUrl,
-                                //   productTitle: titleController.text,
-                                //   productPrice: priceController.text,
-                                //   productQuantity: codeController.text,
-                                //   productDescription:
-                                //       descriptionController.text,
-                                // );
+                                ProductEntity addProductInputEntity =
+                                    ProductEntity(
+                                        name: titleController.text,
+                                        price: priceController.text,
+                                        code: codeController.text,
+                                        description: descriptionController.text,
+                                        imageFile: fileImage,
+                                        isFeatured: isFeatured,
+                                        isOrganic: isOrganic,
+                                        expirationMonths: int
+                                            .parse(expirationMonthsController
+                                                .text),
+                                        numberOfCalories: int
+                                            .parse(caloriesController.text),
+                                        unitAmount:
+                                            int.parse(calorieAmountController
+                                                .text),
+                                        reviews: [],
+                                        discountAmount: discountAmountController
+                                                .text.isEmpty
+                                            ? 0
+                                            : double.parse(
+                                                discountAmountController.text));
+                                await context
+                                    .read<AddNewProductCubit>()
+                                    .addNewProduct(
+                                        addProductInputEntity:
+                                            addProductInputEntity);
                                 if (mounted) {
-                                  BlocProvider.of<AddNewProductCubit>(context)
-                                      .refreshThePage();
                                   showErrorORWarningDialog(
                                       context: context,
                                       subtitle: "مسح النموذج",
